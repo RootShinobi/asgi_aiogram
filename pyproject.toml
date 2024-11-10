@@ -1,0 +1,46 @@
+[project]
+name = "asgi_aiogram"
+authors = [
+    { name = "RootShinobi" },
+]
+description = "small translation tools for aiogram"
+readme = "README.md"
+license = { text = "MIT License" }
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Typing :: Typed",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+keywords = [
+    "telegram",
+    "bot",
+    "api",
+    "asgi",
+    "wrapper",
+    "asyncio",
+    "i18n",
+    "aiogram"
+]
+dynamic = ["version"]
+dependencies = [
+    "aiogram>=3.9.0",
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.hatch.version]
+path = "aiogram_i18n/__meta__.py"
+
+[project.urls]
+Repository = "https://github.com/aiogram/aiogram_i18n"
