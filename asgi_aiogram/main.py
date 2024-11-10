@@ -5,7 +5,8 @@ from typing import Any
 from aiogram import Dispatcher
 from aiogram.types import Update
 
-from asgi_aiogram.helpers import error, ok, read_body
+from asgi_aiogram.responses import ok, error
+from asgi_aiogram.asgi import read_body
 from asgi_aiogram.strategy.base import BaseStrategy
 from asgi_aiogram.types import ScopeType
 

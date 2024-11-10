@@ -3,7 +3,7 @@ from typing import Any, Sequence
 
 from aiogram import Bot
 
-from asgi_aiogram.helpers import parce_path
+from asgi_aiogram.path_normalization import parse_path
 from asgi_aiogram.strategy.base import BaseStrategy
 from asgi_aiogram.types import ScopeType
 
@@ -11,9 +11,7 @@ from asgi_aiogram.types import ScopeType
 class TokenBasedStrategy(BaseStrategy):
     def __init__(self, path: str, bot_settings: dict[str, Any]):
         super().__init__(path)
-        if "{bot_token}" not in path:
-            raise ValueError("Path should contains '{bot_token}' substring")
-        self._path_prefix, self._slice, self._path_postfix = parce_path(path)
+        self._path_prefix, self._slice, self._path_postfix = parse_path(path)
         self._bots: dict[str, Bot] = {}
         self._bot_settings = bot_settings
 
