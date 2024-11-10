@@ -7,14 +7,12 @@ from asgi_aiogram.types import ScopeType
 
 
 class SingleStrategy(BaseStrategy):
-    def __init__(self, bot: Bot):
+    def __init__(self, path: str, bot: Bot):
+        super().__init__(path)
         self._bot = bot
 
     async def resolve_bot(self, scope: ScopeType) -> Bot | None:
         return self._bot
-
-    async def verify_path(self, path: str) -> bool:
-        return True
 
     async def shutdown(self):
         await self._bot.session.close()

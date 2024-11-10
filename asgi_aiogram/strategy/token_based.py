@@ -10,6 +10,7 @@ from asgi_aiogram.types import ScopeType
 
 class TokenBasedStrategy(BaseStrategy):
     def __init__(self, path: str, bot_settings: dict[str, Any]):
+        super().__init__(path)
         if "{bot_token}" not in path:
             raise ValueError("Path should contains '{bot_token}' substring")
         self._path_prefix, self._slice, self._path_postfix = parce_path(path)

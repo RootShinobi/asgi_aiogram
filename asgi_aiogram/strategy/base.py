@@ -7,14 +7,15 @@ from asgi_aiogram.types import ScopeType
 
 
 class BaseStrategy(ABC):
+    def __init__(self, path: str) -> None:
+        self._path = path
 
     @abstractmethod
     async def resolve_bot(self, scope: ScopeType) -> Bot | None:
         pass
 
-    @abstractmethod
     async def verify_path(self, path: str) -> bool:
-        pass
+        return self._path == path
 
     async def startup(self):
         pass

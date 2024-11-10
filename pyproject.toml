@@ -1,12 +1,12 @@
-[project]
+[tool.poetry]
 name = "asgi_aiogram"
-authors = [
-    { name = "RootShinobi" },
-]
+authors = ["RootShinobi <111008396+RootShinobi@users.noreply.github.com>"]
 description = "fast ASGI wraper for aiogram"
 readme = "README.md"
-license = { text = "MIT License" }
-requires-python = ">=3.9"
+license = "MIT License"
+version = "0.1.1"
+
+[project]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -23,15 +23,12 @@ keywords = [
     "asgi",
     "wrapper",
     "asyncio",
-    "aiogram"
-]
-dynamic = ["version"]
-dependencies = [
-    "aiogram>=3.9.0",
+    "aiogram",
 ]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+aiogram = "^3.9"
 
 
 [build-system]
@@ -43,3 +40,4 @@ path = "asgi_aiogram/__meta__.py"
 
 [project.urls]
 Repository = "https://github.com/RootShinobi/asgi_aiogram"
+
