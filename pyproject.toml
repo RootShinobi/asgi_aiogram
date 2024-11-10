@@ -3,7 +3,7 @@ name = "asgi_aiogram"
 authors = [
     { name = "RootShinobi" },
 ]
-description = "small translation tools for aiogram"
+description = "fast ASGI wraper for aiogram"
 readme = "README.md"
 license = { text = "MIT License" }
 requires-python = ">=3.9"
@@ -23,7 +23,6 @@ keywords = [
     "asgi",
     "wrapper",
     "asyncio",
-    "i18n",
     "aiogram"
 ]
 dynamic = ["version"]
@@ -40,7 +39,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.hatch.version]
-path = "aiogram_i18n/__meta__.py"
+path = "asgi_aiogram/__meta__.py"
 
 [project.urls]
-Repository = "https://github.com/aiogram/aiogram_i18n"
+Repository = "https://github.com/RootShinobi/asgi_aiogram"
