@@ -15,7 +15,7 @@ class TokenBasedStrategy(BaseStrategy):
         self._bots: dict[str, Bot] = {}
         self._bot_settings = bot_settings
 
-    async def verify_path(self, path: str) -> bool:
+    def verify_path(self, path: str) -> bool:
         if not path.startswith(self._path_prefix):
             return False
         if not path.endswith(self._path_postfix):

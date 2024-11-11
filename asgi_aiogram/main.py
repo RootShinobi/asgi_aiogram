@@ -5,7 +5,8 @@ from typing import Any
 from aiogram import Dispatcher
 from aiogram.types import Update
 
-from asgi_aiogram.responses import ok, error
+from asgi_aiogram.aliases import Sender, Receiver
+from asgi_aiogram.responses import ok, error, not_found
 from asgi_aiogram.asgi import read_body
 from asgi_aiogram.strategy.base import BaseStrategy
 from asgi_aiogram.types import ScopeType
@@ -32,10 +33,11 @@ class ASGIAiogram:
         self.logger = getLogger("asgi_aiogram")
         self.task_list = set()
 
-    async def post(self, scope: ScopeType, receive, send):
-        if await self.strategy.verify_path(scope["path"]):
-            bot = await self.strategy.resolve_bot(scope)
+    async def post(self, scope: ScopeType, receive: Receiver, send: Sender):
+        if self.strategy.verify_path(path=scope["path"]):
+            bot = await self.strategy.resolve_bot(scope=scope)
             if bot is None:
+                await not_found(send=send)
                 return
             try:
                 cor = self.dispatcher.feed_update(
@@ -55,18 +57,18 @@ class ASGIAiogram:
                     #         value=response.__api_method__
                     #     )
                     #     await answer(send, form)
-                await ok(send)
+                await ok(send=send)
                 return
             except Exception as e:
                 self.logger.error(e)
-                await error(send)
+                await error(send=send)
             return
         self.logger.warning("unknown path: %s", scope['path'])
 
-    async def get(self, scope: ScopeType, receive, send):
+    async def get(self, scope: ScopeType, receive: Receiver, send: Sender):
         pass
 
-    async def lifespan(self, scope: ScopeType, receive, send):
+    async def lifespan(self, scope: ScopeType, receive: Receiver, send: Sender):
         while True:
             message = await receive()
             if message['type'] == 'lifespan.startup':
@@ -103,18 +105,18 @@ class ASGIAiogram:
             else:
                 self.logger.warning("unknown lifespan type: %s", message['type'])
 
-    async def http(self, scope: ScopeType, receive, send):
+    async def http(self, scope: ScopeType, receive: Receiver, send: Sender):
         if scope["method"] == "POST":
-            return await self.post(scope, receive, send)
+            return await self.post(scope=scope, receive=receive, send=send)
         if scope["method"] == "GET":
-            return await self.get(scope, receive, send)
+            return await self.get(scope=scope, receive=receive, send=send)
         self.logger.info("unsupported method: %s", scope['type'])
 
 
 
-    async def __call__(self, scope: ScopeType, receive, send):
+    async def __call__(self, scope: ScopeType, receive: Receiver, send: Sender):
         if scope['type'] == 'http':
-            return await self.http(scope, receive, send)
+            return await self.http(scope=scope, receive=receive, send=send)
         if scope['type'] == 'lifespan':
-            return await self.lifespan(scope, receive, send)
-        self.logger.warning("unknown event type:", scope['type'])
+            return await self.lifespan(scope=scope, receive=receive, send=send)
+        self.logger.warning("unsupported event type:", scope['type'])

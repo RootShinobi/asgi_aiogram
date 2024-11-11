@@ -14,7 +14,7 @@ class BaseStrategy(ABC):
     async def resolve_bot(self, scope: ScopeType) -> Bot | None:
         pass
 
-    async def verify_path(self, path: str) -> bool:
+    def verify_path(self, path: str) -> bool:
         return self._path == path
 
     async def startup(self):

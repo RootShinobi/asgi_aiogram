@@ -1,6 +1,9 @@
 from aiohttp.formdata import FormData
 
-async def answer(send, form: FormData) -> None:
+from asgi_aiogram.aliases import Sender
+
+
+async def answer(send: Sender, form: FormData) -> None:
     data = form()
     body = data.decode().encode(encoding='utf-8')
     await send({
@@ -16,21 +19,20 @@ async def answer(send, form: FormData) -> None:
         'body': body,
     })
 
-async def _send_code(send, code: int) -> None:
+async def _send_code(send: Sender, code: int) -> None:
     await send({
         'type': 'http.response.start',
         'status': code,
-        'headers': [
-            (b'content-length', b"0")
-        ]
     })
     await send({
         'type': 'http.response.body',
-        'body': b"",
     })
 
-async def ok(send) -> None:
+async def ok(send: Sender) -> None:
     await _send_code(send, 200)
 
-async def error(send) -> None:
+async def error(send: Sender) -> None:
     await _send_code(send, 500)
+
+async def not_found(send: Sender) -> None:
+    await _send_code(send, 404)

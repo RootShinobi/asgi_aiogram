@@ -1,4 +1,6 @@
-async def read_body(receive) -> bytes:
+from asgi_aiogram.aliases import Receiver
+
+async def read_body(receive: Receiver) -> bytes:
     body = b''
     more_body = True
 

@@ -4,7 +4,7 @@ authors = ["RootShinobi <111008396+RootShinobi@users.noreply.github.com>"]
 description = "fast ASGI wraper for aiogram"
 readme = "README.md"
 license = "MIT License"
-version = "0.1.2"
+version = "0.1.3"
 
 [project]
 classifiers = [
