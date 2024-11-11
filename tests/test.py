@@ -36,7 +36,3 @@ def test_asgi(benchmark, name, port):
     result = benchmark(call, session, request)
     assert result == 200
 
-
-#1 aiogram run webhook mini_app:dp --port 8082 --token 1:b
-#2 uvicorn asgi:app --port 8081 --workers 10 --log-level critical
-#3 pytest test.py
