@@ -1,6 +1,5 @@
 from typing import TypedDict, Literal, NotRequired
 
-
 class ScopeType(TypedDict):
     type: Literal['http', 'lifespan']
     scheme: str
@@ -10,7 +9,6 @@ class ScopeType(TypedDict):
     method: str
     path: str
     headers: list[tuple[bytes, bytes]]
-
 
 class SendEventType(TypedDict):
     type: Literal[

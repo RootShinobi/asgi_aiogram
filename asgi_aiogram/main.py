@@ -77,6 +77,7 @@ class ASGIAiogram:
                         **self.kwargs,
                         bots=self.strategy.bots,
                         bot=self.strategy.bot,
+                        scope=scope,
                     )
                     await self.strategy.startup()
                 except Exception as e:
@@ -90,7 +91,8 @@ class ASGIAiogram:
                         await self.dispatcher.emit_shutdown(
                             **self.kwargs,
                             bots=self.strategy.bots,
-                            bot=self.strategy.bot
+                            bot=self.strategy.bot,
+                            scope=scope,
                         )
                     finally:
                         await self.strategy.shutdown()
