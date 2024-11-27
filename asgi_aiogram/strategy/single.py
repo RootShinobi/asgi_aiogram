@@ -8,8 +8,11 @@ from asgi_aiogram.types import ScopeType
 
 class SingleStrategy(BaseStrategy):
     def __init__(self, path: str, bot: Bot):
-        super().__init__(path)
+        self._path = path
         self._bot = bot
+
+    def verify_path(self, path: str) -> bool:
+        return self._path == path
 
     async def resolve_bot(self, scope: ScopeType) -> Bot | None:
         return self._bot

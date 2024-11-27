@@ -43,6 +43,7 @@ class ASGIAiogram:
                 cor = self.dispatcher.feed_update(
                     bot=bot,
                     update=Update.model_validate_json(await read_body(receive)),
+                    **self.kwargs,
                 )
                 if self.handle_as_tasks:
                     handle_update_task = create_task(cor)
