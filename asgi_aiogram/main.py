@@ -1,86 +1,40 @@
-from asyncio import create_task
 from logging import getLogger
 from typing import Any
 
-from aiogram import Dispatcher
-from aiogram.types import Update
-
-from asgi_aiogram.aliases import Sender, Receiver
-from asgi_aiogram.responses import ok, error, not_found
-from asgi_aiogram.asgi import read_body
-from asgi_aiogram.strategy.base import BaseStrategy
+from asgi_aiogram.aliases import Receiver, Sender
+from asgi_aiogram.responses import not_found
+from asgi_aiogram.strategy import BaseStrategy
 from asgi_aiogram.types import ScopeType
 
 
 class ASGIAiogram:
     def __init__(self,
-        dispatcher: Dispatcher,
-        strategy: BaseStrategy,
-        handle_as_tasks: bool = True,
-        handle_signals: bool = True,
+        *strategies: BaseStrategy,
         **kwargs: Any
     ):
-        self.dispatcher = dispatcher
-        self.handle_as_tasks = handle_as_tasks
-        self.handle_signals = handle_signals
-        self.strategy = strategy
-        self.kwargs = {
-            "dispatcher": self.dispatcher,
-            **self.dispatcher.workflow_data,
-            **kwargs,
-        }
-        self.kwargs.pop("bot", None)
+        self.strategies = strategies
+        self.kwargs = kwargs
         self.logger = getLogger("asgi_aiogram")
-        self.task_list = set()
+        self.resolve_chance = {}
 
-    async def post(self, scope: ScopeType, receive: Receiver, send: Sender):
-        if self.strategy.verify_path(path=scope["path"]):
-            bot = await self.strategy.resolve_bot(scope=scope)
-            if bot is None:
-                await not_found(send=send)
-                return
-            try:
-                cor = self.dispatcher.feed_update(
-                    bot=bot,
-                    update=Update.model_validate_json(await read_body(receive)),
-                    **self.kwargs,
-                )
-                if self.handle_as_tasks:
-                    handle_update_task = create_task(cor)
-                    self.task_list.add(handle_update_task)
-                    handle_update_task.add_done_callback(self.task_list.discard)
-                else:
-                    await cor
-                    # if isinstance(response, TelegramMethod):
-                    #     form = bot.session.build_form_data(bot, response)
-                    #     form.add_field(
-                    #         name="method",
-                    #         value=response.__api_method__
-                    #     )
-                    #     await answer(send, form)
-                await ok(send=send)
-                return
-            except Exception as e:
-                self.logger.error(e)
-                await error(send=send)
-            return
-        self.logger.warning("unknown path: %s", scope['path'])
+    def resolve_strategy(self, scope: ScopeType) -> BaseStrategy | None:
+        key = (scope["method"], scope["path"])
+        if key not in self.resolve_chance:
+            for strategy in self.strategies:
+                if strategy.verify_path(scope=scope):
+                    self.resolve_chance[key] = strategy
+                    return strategy
+            return None
+        return self.resolve_chance[key]
 
-    async def get(self, scope: ScopeType, receive: Receiver, send: Sender):
-        pass
 
     async def lifespan(self, scope: ScopeType, receive: Receiver, send: Sender):
         while True:
             message = await receive()
             if message['type'] == 'lifespan.startup':
                 try:
-                    await self.dispatcher.emit_startup(
-                        **self.kwargs,
-                        bots=self.strategy.bots,
-                        bot=self.strategy.bot,
-                        scope=scope,
-                    )
-                    await self.strategy.startup()
+                    for strategy in self.strategies:
+                        await strategy.startup(kwargs=self.kwargs)
                 except Exception as e:
                     self.logger.error(e)
                     await send({'type': 'lifespan.startup.failed'})
@@ -88,15 +42,8 @@ class ASGIAiogram:
                     await send({'type': 'lifespan.startup.complete'})
             elif message['type'] == 'lifespan.shutdown':
                 try:
-                    try:
-                        await self.dispatcher.emit_shutdown(
-                            **self.kwargs,
-                            bots=self.strategy.bots,
-                            bot=self.strategy.bot,
-                            scope=scope,
-                        )
-                    finally:
-                        await self.strategy.shutdown()
+                    for strategy in self.strategies:
+                        await strategy.shutdown(kwargs=self.kwargs)
                 except Exception as e:
                     self.logger.error(e)
                     await send({'type': 'lifespan.shutdown.failed'})
@@ -109,11 +56,12 @@ class ASGIAiogram:
                 self.logger.warning("unknown lifespan type: %s", message['type'])
 
     async def http(self, scope: ScopeType, receive: Receiver, send: Sender):
-        if scope["method"] == "POST":
-            return await self.post(scope=scope, receive=receive, send=send)
-        if scope["method"] == "GET":
-            return await self.get(scope=scope, receive=receive, send=send)
-        self.logger.info("unsupported method: %s", scope['type'])
+        strategy = self.resolve_strategy(scope=scope)
+        if strategy is None:
+            self.logger.warning("unknown request. method: %s path: %s", scope["method"], scope['path'])
+            await not_found(send=send)
+            return
+        return await strategy.handle(scope=scope, receive=receive, send=send)
 
 
 

@@ -1,4 +1,4 @@
-from typing import TypedDict, Literal, NotRequired
+from typing import TypedDict, Literal, NotRequired, Iterable
 
 class ScopeType(TypedDict):
     type: Literal['http', 'lifespan']
@@ -20,10 +20,11 @@ class SendEventType(TypedDict):
         "lifespan.shutdown.failed",
     ]
     status: NotRequired[int]
-    headers: NotRequired[list[tuple[bytes, bytes]]]
+    headers: NotRequired[Iterable[tuple[bytes, bytes]]]
     body: NotRequired[bytes]
+    more_body: NotRequired[bool]
 
 class ReceiveEventType(TypedDict):
     type: str
     body: NotRequired[bytes]
-    more_body: NotRequired[Literal[True, False]]
+    more_body: NotRequired[bool]
