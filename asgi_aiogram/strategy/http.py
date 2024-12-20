@@ -14,7 +14,7 @@ class HttpStrategy(BaseStrategy):
     kwargs: dict
 
     async def startup(self, kwargs: dict):
-        self.kwargs = kwargs
+        self.kwargs = dict(kwargs)
 
     async def handle(self, scope: ScopeType, receive: Receiver, send: Sender) -> bytes | None:
         response = await self._handler.call(

@@ -57,7 +57,7 @@ class BaseBotStrategy(BaseStrategy):
         return
 
     async def startup(self, kwargs: dict):
-        self.kwargs = kwargs
+        self.kwargs = dict(kwargs)
         self.kwargs.pop("bot", None)
         self.kwargs.pop("dispatcher", None)
         await self.dispatcher.emit_startup(
@@ -69,7 +69,7 @@ class BaseBotStrategy(BaseStrategy):
         )
 
     async def shutdown(self, kwargs: dict):
-        self.kwargs = kwargs
+        self.kwargs = dict(kwargs)
         self.kwargs.pop("bot", None)
         self.kwargs.pop("dispatcher", None)
         await self.dispatcher.emit_shutdown(
